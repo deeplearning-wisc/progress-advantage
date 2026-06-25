@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+results/
+.claude/
+.venv/
+
+# Artifacts are fetched on demand via `python -m pa.data` (see data/README.md).
+data/*
+!data/README.md
+
+# local agent instructions — never publish
+CLAUDE.md
