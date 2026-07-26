@@ -63,7 +63,7 @@ class LogprobScorer:
 
     @torch.no_grad()
     def score(
-        self, message_texts: Sequence[str], is_action: Sequence[bool]
+        self, message_texts: Sequence[str], is_action: Sequence[bool], compute_topk: bool = True
     ) -> StepCache:
         spans: List[Tuple[int, int]] = []
         full: List[int] = []
@@ -99,12 +99,16 @@ class LogprobScorer:
 
         targets = torch.tensor(full, device=log_probs.device)
         gathered = log_probs[:-1].gather(1, targets[1:].unsqueeze(-1)).squeeze(-1)
-
-        k = min(self.top_k, log_probs.size(-1))
-        topk = log_probs[:-1].topk(k, dim=-1).values.mean(dim=-1)
-
         gathered_np = gathered.cpu().numpy().astype(np.float32)
-        topk_np = topk.cpu().numpy().astype(np.float32)
+
+        # top-K mean is only needed by the certainty baselines; skip the full-vocab
+        # topk when a caller (e.g. the merged-reference sweep) only uses `gathered`.
+        if compute_topk:
+            k = min(self.top_k, log_probs.size(-1))
+            topk = log_probs[:-1].topk(k, dim=-1).values.mean(dim=-1)
+            topk_np = topk.cpu().numpy().astype(np.float32)
+        else:
+            topk_np = None
 
         out_g: List[np.ndarray] = []
         out_t: List[np.ndarray] = []
@@ -120,7 +124,7 @@ class LogprobScorer:
                 out_t.append(empty())
             else:
                 out_g.append(gathered_np[lo:hi])
-                out_t.append(topk_np[lo:hi])
+                out_t.append(topk_np[lo:hi] if topk_np is not None else empty())
         return StepCache(gathered=out_g, topk_mean=out_t, is_action=list(is_action))
 
 
