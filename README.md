@@ -13,8 +13,9 @@ Official codebase of the paper "_Neglected Free Lunch from Post-training: Progre
 
 
 ## News
+- [Jul 2, 2026] Progress Advantage won the best paper award🏆 at [RLxF@ICML2026](https://sites.google.com/view/rlxf-icml2026/accepted-papers)
 - [Jun 24, 2026] The paper is now alive at arXiv [🔗](https://arxiv.org/abs/2606.26080); we release the intial codebase.
-- [Jun 1, 2026] Progress Advantage got accepted by a workshop at ICML 2026, [RLxF: Reinforcement Learning from World Feedback](https://sites.google.com/view/rlxf-icml2026)🎉 - Seongheon will present the poster!
+- [Jun 1, 2026] Progress Advantage got accepted by a workshop at ICML 2026, [RLxF: Reinforcement Learning from World Feedback](https://sites.google.com/view/rlxf-icml2026)🎉
 
 
 ## 0. Overview
@@ -38,6 +39,7 @@ pa/
 ├── aggregations.py    # token/step aggregations
 ├── baselines.py       
 ├── data.py            # on-demand artifact download
+├── merging.py         # weight-space merged reference policies
 ├── models.py          # MODEL_PAIRS - policy/reference checkpoints
 ├── scoring.py         # one-pass log-prob extraction
 └── trajectory.py      # tau2/Who&When message -> action span rendering
@@ -168,6 +170,22 @@ score = aggregate_steps(A, step_agg)                   # trajectory scalar
 ```
 
 
+
+### 6.2. Reference policy merging
+
+Instead of the pure base checkpoint reference policy, the denominator of the progress advantage can be a weight-space merge `π_α = π_ref + α · τ` of the reference and policy checkpoints (`α = 0` recovers `π_ref`, `α = 1` the policy). `MergedReference` is a drop-in for `LogprobScorer`, and `set_alpha` rewrites the resident model, so an α sweep loads the checkpoints once.
+
+```python
+from pa import MODEL_PAIRS, MergedReference
+
+pair = MODEL_PAIRS["qwen3.5-9b"]
+ref = MergedReference(pair["policy"], pair["reference"], method="ties", density=0.2)
+for alpha in [0.0, 0.2, 0.4, 0.6, 0.8]:
+    ref.set_alpha(alpha)
+    cache = ref.score(message_texts, is_action)   # then score as usual
+```
+
+`method` is one of `linear`, `ties`, `dare_linear`, `dare_ties` (sparsification and sign consensus follow [mergekit](https://github.com/arcee-ai/mergekit)) or `emr` ([EMR-Merging](https://github.com/harveyhuang18/EMR_Merging)). 
 
 ### Per-scenario reduction
 
