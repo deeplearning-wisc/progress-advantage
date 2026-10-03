@@ -13,14 +13,15 @@ Official codebase of the paper "_Neglected Free Lunch from Post-training: Progre
 
 
 ## News
+- [Sep 24, 2026] The paper got accepted by NeurIPS 2026🎉
 - [Jul 2, 2026] Progress Advantage won the best paper award🏆 at [RLxF@ICML2026](https://sites.google.com/view/rlxf-icml2026/accepted-papers)
-- [Jun 24, 2026] The paper is now alive at arXiv [🔗](https://arxiv.org/abs/2606.26080); we release the intial codebase.
+- [Jun 24, 2026] The paper is now alive at arXiv [🔗](https://arxiv.org/abs/2606.26080); we release the initial codebase.
 - [Jun 1, 2026] Progress Advantage got accepted by a workshop at ICML 2026, [RLxF: Reinforcement Learning from World Feedback](https://sites.google.com/view/rlxf-icml2026)🎉
 
 
 ## 0. Overview
 
-Progress avantage,
+Progress advantage,
 
 ```
 A_t = β · log [ π_θ(a_t | s_t) / π_ref(a_t | s_t) ],
@@ -202,7 +203,7 @@ err_step = argmin(cumsum(A))        # or sharpest drop / earliest below threshol
 
 ## License
 * We release our codebase and artifacts under MIT license. The datasets and models we used for this project have their own license, noted as below.
-* If we use our progress advantage method with other model families and datasets, you should check their own licenses.
+* If you use our progress advantage method with other model families and datasets, you should check their own licenses.
 
 ### Dataset
 | Dataset Name  | License    |
@@ -221,3 +222,16 @@ err_step = argmin(cumsum(A))        # or sharpest drop / earliest below threshol
 | Google       | (`Gemma-4-E4B-it`, `Gemma-4-E4B`)                | Apache-2.0 |
 | AI2          | (`Olmo-3-7B-Instruct`, `Olmo-3-7B-Instruct-DPO`) | Apache-2.0 |
 
+
+## Citation
+
+If you find this work useful, please consider citing our paper:
+
+```bibtex
+@inproceedings{oh2026neglected,
+  title     = {Neglected Free Lunch from Post-training: Progress Advantage for {LLM} Agents},
+  author    = {Oh, Changdae and Li, Wendi and Park, Seongheon and Yeh, Samuel and Mallick, Tanwi and Li, Sharon},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026}
+}
+```
